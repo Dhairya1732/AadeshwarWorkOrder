@@ -7,6 +7,7 @@ from PyQt5.QtCore import QSettings, QDir
 from utils import set_run_font
 from docx2pdf import convert 
 import os
+from datetime import timedelta, datetime
 
 COMPANY_NAME = "Aadeshwar"
 APP_NAME = "WorkOrderGenerator"
@@ -15,7 +16,7 @@ class WorkOrderAppBackend:
     def __init__(self):
         self.excel_path = ''
         self.template_path = ''
-        self.download_path = QDir.homePath()  # 
+        self.download_path = QDir.homePath()  
         self.settings = QSettings(COMPANY_NAME, APP_NAME)
         self.load_settings()
 
@@ -46,6 +47,19 @@ class WorkOrderAppBackend:
             order_data = row.to_dict()
             for column in columns_to_ignore:
                 order_data.pop(column, None)
+
+            if 'Order Confirmed Date' in order_data:
+                order_data['Order Confirmed Date'] = order_data['Order Confirmed Date'].date()
+
+            if 'To be shipped Before' in order_data:
+                delivery_date = order_data['To be shipped Before']
+                if pd.notnull(delivery_date):
+                    adjusted_date = (delivery_date - timedelta(days=2)).date()
+                    order_data['To be shipped Before'] = adjusted_date
+
+            current_month = datetime.now().strftime("%B")
+            order_no = f"G1/{current_month}/{self.current_order_no}"
+            order_data['OrderNo'] = order_no
             
             docx_output_path = os.path.join(self.download_path, f"Work_Order_{index + 1}.docx")
             pdf_output_path = os.path.join(self.download_path, f"Work_Order_{index + 1}.pdf")
@@ -53,6 +67,7 @@ class WorkOrderAppBackend:
             self.process_work_order(order_data, self.template_path, docx_output_path, image_width=Pt(100), image_height=Pt(100))
             convert(docx_output_path, pdf_output_path)
             os.remove(docx_output_path)
+            self.current_order_no += 1
     
     def process_work_order(self, data, template_path, output_path, image_width=None, image_height=None):
         doc = Document(template_path)

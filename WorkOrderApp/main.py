@@ -7,3 +7,4 @@ if __name__ == '__main__':
     ex = WorkOrderAppUI()
     ex.show()
     sys.exit(app.exec_())
+    
