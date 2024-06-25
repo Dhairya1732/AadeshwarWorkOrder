@@ -15,14 +15,19 @@ APP_NAME = "WorkOrderGenerator"
 class WorkOrderAppBackend:
     def __init__(self):
         self.csv_path = ''
-        self.template_path = ''
+        self.foaming_template_path = ''
+        self.carpenter_template_path = ''
+        self.sales_template_path = ''
         self.download_path = QDir.homePath()  
         self.settings = QSettings(COMPANY_NAME, APP_NAME)
         self.load_settings()
 
     def load_settings(self):
         self.download_path = self.settings.value("download_path", QDir.homePath())
-        self.template_path = self.settings.value("template_path", '')
+        self.foaming_template_path = self.settings.value("foaming_template_path", '')
+        self.carpenter_template_path = self.settings.value("carpenter_template_path", '')
+        self.sales_template_path = self.settings.value("sales_template_path", '')
+
 
     def save_settings(self):
         self.settings.setValue("download_path", self.download_path)
@@ -30,9 +35,17 @@ class WorkOrderAppBackend:
     def set_csv_path(self, path):
         self.csv_path = path
     
-    def set_template_path(self, path):
-        self.template_path = path
-        self.settings.setValue("template_path", self.template_path)
+    def set_foaming_template_path(self, path):
+        self.foaming_template_path = path
+        self.settings.setValue("foaming_template_path", self.foaming_template_path)
+
+    def set_carpenter_template_path(self, path):
+        self.carpenter_template_path = path
+        self.settings.setValue("carpenter_template_path", self.carpenter_template_path)
+
+    def set_sales_template_path(self, path):
+        self.sales_template_path = path
+        self.settings.setValue("sales_template_path", self.sales_template_path)
 
     def set_download_path(self, path):
         self.download_path = path
@@ -52,25 +65,38 @@ class WorkOrderAppBackend:
                 order_data['Order Confirmed Date'] = pd.to_datetime(order_data['Order Confirmed Date'],dayfirst=True).date()
 
             if 'To be shipped Before' in order_data:
-                delivery_date = order_data['To be shipped Before']
+                delivery_date = pd.to_datetime(order_data['To be shipped Before'],dayfirst=True)
                 if pd.notnull(delivery_date):
                     adjusted_date = (delivery_date - timedelta(days=2)).date()
-                    order_data['To be shipped Before'] = adjusted_date
+                    order_data['To be shipped Before'] = adjusted_date.strftime(f"%d-%m-%Y")
 
             current_month = datetime.now().strftime("%B")
             order_no = f"G1/{current_month}/{self.current_order_no}"
             order_data['OrderNo'] = order_no
-            
-            docx_output_path = os.path.join(self.download_path, f"Foaming_{index + 1}.docx")
-            pdf_output_path = os.path.join(self.download_path, f"Foaming_{index + 1}.pdf")
-            
-            self.process_work_order(order_data, self.template_path, docx_output_path, image_width=Pt(100), image_height=Pt(100))
-            convert(docx_output_path, pdf_output_path)
-            os.remove(docx_output_path)
+            self.create_work_order(order_data, self.foaming_template_path, f"foaming_{index+1}.pdf")
+            self.create_work_order(order_data, self.carpenter_template_path, f"carpenter_{index+1}.pdf")
+            self.create_work_order(order_data, self.sales_template_path, f"sales_{index+1}.pdf")
             self.current_order_no += 1
     
-    def process_work_order(self, data, template_path, output_path, image_width=None, image_height=None):
-        doc = Document(template_path)
+    def create_work_order(self, order_data, template_path, pdf_filename):
+        pdf_output_path = os.path.join(self.download_path, pdf_filename)     
+        try:
+            docx_filename = pdf_filename.replace('.pdf', '.docx')
+            docx_output_path = os.path.join(self.download_path, docx_filename)
+            self.process_work_order(order_data, template_path, docx_output_path, image_width=Pt(100), image_height=Pt(100))
+            convert(docx_output_path, pdf_output_path)
+            print(f"Successfully processed work order {order_data['OrderNo']}.")
+            os.remove(docx_output_path)
+        except Exception as e:
+            print(f"Failed to process work order {order_data['OrderNo']}: {e}")
+
+    def process_work_order(self, data, foaming_template_path, output_path, image_width=None, image_height=None):
+        try:
+            doc = Document(foaming_template_path)
+        except Exception as e:
+            print(f"Error opening template: {e}")
+            return
+        
         for key, value in data.items():
             if isinstance(value, str):
                 value = value.strip()
@@ -86,11 +112,19 @@ class WorkOrderAppBackend:
                                     paragraph.text = paragraph.text.replace(f'[{key}]', str(value))
                                     for run in paragraph.runs:
                                         set_run_font(run)
-        doc.save(output_path)
-    
+
+        try:
+            doc.save(output_path)
+            print(f"Document saved to {output_path}")
+        except Exception as e:
+            print(f"Error saving document: {e}")
+
     def insert_image_from_url(self, cell, image_url, width=None, height=None):
-        response = requests.get(image_url)
-        image_stream = BytesIO(response.content)
-        paragraph = cell.paragraphs[0]
-        run = paragraph.add_run()
-        run.add_picture(image_stream, width=width, height=height)
+        try:
+            response = requests.get(image_url)
+            image_stream = BytesIO(response.content)
+            paragraph = cell.paragraphs[0]
+            run = paragraph.add_run()
+            run.add_picture(image_stream, width=width, height=height)
+        except Exception as e:
+            print(f"Error inserting image from URL {image_url}: {e}")

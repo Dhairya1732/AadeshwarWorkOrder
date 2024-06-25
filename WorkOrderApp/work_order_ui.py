@@ -31,41 +31,44 @@ class WorkOrderAppUI(QWidget):
         self.csv_btn.setGeometry(300, 20, 200, 60)
         set_button_style(self.csv_btn)
         
-        self.template_btn = QPushButton('Upload Word Template',self)
-        self.template_btn.clicked.connect(self.upload_template)
-        self.template_btn.setGeometry(30, 110, 230, 60)  
-        set_button_style(self.template_btn)
+        self.foaming_template_btn = QPushButton('Upload Foaming',self)
+        self.foaming_template_btn.clicked.connect(self.upload_foaming_template)
+        self.foaming_template_btn.setGeometry(30, 110, 200, 60)  
+        set_button_style(self.foaming_template_btn)
+
+        self.carpenter_template_btn = QPushButton('Upload Carpenter', self)
+        self.carpenter_template_btn.clicked.connect(self.upload_carpenter_template)
+        self.carpenter_template_btn.setGeometry(300, 110, 200, 60)
+        set_button_style(self.carpenter_template_btn)
+
+        self.sales_template_btn = QPushButton('Upload Sales', self)
+        self.sales_template_btn.clicked.connect(self.upload_sales_template)
+        self.sales_template_btn.setGeometry(30, 200, 200, 60)
+        set_button_style(self.sales_template_btn)
         
         self.generate_btn = QPushButton('Generate Work Order',self)
         self.generate_btn.clicked.connect(self.generate_work_order)
-        self.generate_btn.setGeometry(150, 200, 230, 60)
+        self.generate_btn.setGeometry(150, 280, 230, 60)
         set_button_style(self.generate_btn)
         self.generate_btn.setEnabled(False)
         
         self.status_label = QLabel('',self)
-        self.status_label.setGeometry(20, 280, 550, 50)
+        self.status_label.setGeometry(20, 360, 550, 50)
         self.status_label.setStyleSheet("Qlabel { font-size: 15px; }")
 
         self.order_no_input = QLineEdit(self)
         self.order_no_input.setPlaceholderText("Enter Starting Order Number")
-        self.order_no_input.setGeometry(300, 110, 200, 30)
+        self.order_no_input.setGeometry(300, 200, 200, 30)
 
         self.save_btn = QPushButton('Save',self)
         self.save_btn.clicked.connect(self.set_order_no)
-        self.save_btn.setGeometry(300, 141, 60, 30)
+        self.save_btn.setGeometry(300, 231, 60, 30)
         self.save_btn.setStyleSheet('QPushButton { padding: 5px; font-size: 14px; background-color:white; }')
 
         self.setWindowTitle('Work Order Generator')
         self.setWindowIcon(QIcon('app_icon.ico'))  
         self.csv_path = ''
         self.template_path = ''
-
-        template_path = self.settings.value("template_path")
-        if template_path and os.path.isfile(template_path):
-            self.template_path = template_path
-            self.status_label.setText('Word Template Loaded')
-        else:
-            self.status_label.setText('Please upload Word Template')
 
         center_widget(self)  
 
@@ -85,13 +88,25 @@ class WorkOrderAppUI(QWidget):
             self.backend.set_csv_path(file_path)
             self.status_label.setText('CSV File Uploaded')
     
-    def upload_template(self):
+    def upload_foaming_template(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload Word Template', '', 'Word Files (*.docx)', options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload Foaming Template', '', 'Word Files (*.docx)', options=options)
         if file_path:
-            self.backend.set_template_path(file_path)
-            self.status_label.setText('Word Template Uploaded')
+            self.backend.set_foaming_template_path(file_path)
+            self.status_label.setText('Foaming Template Uploaded')
+
+    def upload_carpenter_template(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select Carpenter Template", "", "Word Files (*.docx)")
+        if path:
+            self.backend.set_carpenter_template_path(path)
+            self.status_label.setText(f"Carpenter Template Uploaded")
+
+    def upload_sales_template(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select Sales Template", "", "Word Files (*.docx)")
+        if path:
+            self.backend.set_sales_template_path(path)
+            self.status_label.setText(f"Sales Template Uploaded")
 
     def set_order_no(self):
         try:
@@ -111,8 +126,14 @@ class WorkOrderAppUI(QWidget):
         if not self.backend.csv_path:
             self.status_label.setText('Please upload the CSV file')
             return
-        elif not self.backend.template_path:
-            self.status_label.setText('Please upload the Word file')
+        elif not self.backend.foaming_template_path:
+            self.status_label.setText('Please upload the Foaming Template file')
+            return
+        elif not self.backend.carpenter_template_path:
+            self.status_label.setText('Please upload the Carpenter Template file')
+            return
+        elif not self.backend.sales_template_path:
+            self.status_label.setText('Please upload the Sales Template file')
             return
         
         if not self.generate_btn.isEnabled():
