@@ -8,7 +8,7 @@ def center_widget(widget):
     widget.move(qr.topLeft())
 
 def set_button_style(button):
-    button.setStyleSheet('QPushButton { padding: 10px; font-size: 20px; background-color:white; }')
+    button.setStyleSheet('QPushButton { padding: 10px; font-size: 20px; background-color: white; }')
 
 def set_run_font(run, font_name='Times New Roman', font_size=9):
     run.font.name = font_name

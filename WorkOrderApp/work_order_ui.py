@@ -13,7 +13,7 @@ class WorkOrderAppUI(QWidget):
         super().__init__()
         self.setGeometry(200, 200, 550, 400)
         self.setWindowTitle("Work Order Generator")
-        self.setWindowIcon(QIcon(r"D:\AadeshwarWorkOrder\card_image.png"))
+        self.setWindowIcon(QIcon(r"D:\AadeshwarWorkOrder\Icon\card_image_bAz_icon.ico"))
         self.setStyleSheet("background-color:lightblue")
         self.backend = WorkOrderAppBackend()
         self.settings = QSettings(COMPANY_NAME, APP_NAME)
@@ -26,10 +26,10 @@ class WorkOrderAppUI(QWidget):
         self.set_path_btn.setGeometry(30, 20, 200, 60)
         set_button_style(self.set_path_btn)
 
-        self.excel_btn = QPushButton('Upload Excel File',self)
-        self.excel_btn.clicked.connect(self.upload_excel)
-        self.excel_btn.setGeometry(300, 20, 200, 60)
-        set_button_style(self.excel_btn)
+        self.csv_btn = QPushButton('Upload CSV File',self)
+        self.csv_btn.clicked.connect(self.upload_csv)
+        self.csv_btn.setGeometry(300, 20, 200, 60)
+        set_button_style(self.csv_btn)
         
         self.template_btn = QPushButton('Upload Word Template',self)
         self.template_btn.clicked.connect(self.upload_template)
@@ -57,7 +57,7 @@ class WorkOrderAppUI(QWidget):
 
         self.setWindowTitle('Work Order Generator')
         self.setWindowIcon(QIcon('app_icon.ico'))  
-        self.excel_path = ''
+        self.csv_path = ''
         self.template_path = ''
 
         template_path = self.settings.value("template_path")
@@ -77,13 +77,13 @@ class WorkOrderAppUI(QWidget):
             self.backend.set_download_path(download_path)
 
 
-    def upload_excel(self):
+    def upload_csv(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload Excel File', '', 'Excel Files (*.xlsx)', options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload CSV File', '', 'CSV Files (*.csv)', options=options)
         if file_path:
-            self.backend.set_excel_path(file_path)
-            self.status_label.setText('Excel File Uploaded')
+            self.backend.set_csv_path(file_path)
+            self.status_label.setText('CSV File Uploaded')
     
     def upload_template(self):
         options = QFileDialog.Options()
@@ -108,8 +108,11 @@ class WorkOrderAppUI(QWidget):
             self.generate_btn.setEnabled(False)
     
     def generate_work_order(self):
-        if not self.backend.excel_path or not self.backend.template_path:
-            self.status_label.setText('Please upload both files')
+        if not self.backend.csv_path:
+            self.status_label.setText('Please upload the CSV file')
+            return
+        elif not self.backend.template_path:
+            self.status_label.setText('Please upload the Word file')
             return
         
         if not self.generate_btn.isEnabled():

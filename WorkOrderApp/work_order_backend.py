@@ -14,7 +14,7 @@ APP_NAME = "WorkOrderGenerator"
 
 class WorkOrderAppBackend:
     def __init__(self):
-        self.excel_path = ''
+        self.csv_path = ''
         self.template_path = ''
         self.download_path = QDir.homePath()  
         self.settings = QSettings(COMPANY_NAME, APP_NAME)
@@ -27,8 +27,8 @@ class WorkOrderAppBackend:
     def save_settings(self):
         self.settings.setValue("download_path", self.download_path)
 
-    def set_excel_path(self, path):
-        self.excel_path = path
+    def set_csv_path(self, path):
+        self.csv_path = path
     
     def set_template_path(self, path):
         self.template_path = path
@@ -39,7 +39,7 @@ class WorkOrderAppBackend:
         self.save_settings()
 
     def generate_work_order(self):
-        orders = pd.read_excel(self.excel_path)
+        orders = pd.read_csv(self.csv_path)
         orders = orders.head(1)
         columns_to_ignore = ['Unit Price', 'TOTAL', 'SKU ID', 'Shipping Address', 'status', 'Promised Delivery Date']
         
@@ -49,7 +49,7 @@ class WorkOrderAppBackend:
                 order_data.pop(column, None)
 
             if 'Order Confirmed Date' in order_data:
-                order_data['Order Confirmed Date'] = order_data['Order Confirmed Date'].date()
+                order_data['Order Confirmed Date'] = pd.to_datetime(order_data['Order Confirmed Date'],dayfirst=True).date()
 
             if 'To be shipped Before' in order_data:
                 delivery_date = order_data['To be shipped Before']
@@ -61,8 +61,8 @@ class WorkOrderAppBackend:
             order_no = f"G1/{current_month}/{self.current_order_no}"
             order_data['OrderNo'] = order_no
             
-            docx_output_path = os.path.join(self.download_path, f"Work_Order_{index + 1}.docx")
-            pdf_output_path = os.path.join(self.download_path, f"Work_Order_{index + 1}.pdf")
+            docx_output_path = os.path.join(self.download_path, f"Foaming_{index + 1}.docx")
+            pdf_output_path = os.path.join(self.download_path, f"Foaming_{index + 1}.pdf")
             
             self.process_work_order(order_data, self.template_path, docx_output_path, image_width=Pt(100), image_height=Pt(100))
             convert(docx_output_path, pdf_output_path)
