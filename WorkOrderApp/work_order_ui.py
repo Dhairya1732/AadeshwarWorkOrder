@@ -11,7 +11,7 @@ APP_NAME = "WorkOrderGenerator"
 class WorkOrderAppUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setGeometry(200, 200, 550, 400)
+        self.setGeometry(200, 200, 820, 400)
         self.setWindowTitle("Work Order Generator")
         self.setWindowIcon(QIcon(r"D:\AadeshwarWorkOrder\Icon\card_image_bAz_icon.ico"))
         self.setStyleSheet("background-color:lightblue")
@@ -33,36 +33,41 @@ class WorkOrderAppUI(QWidget):
         
         self.foaming_template_btn = QPushButton('Upload Foaming',self)
         self.foaming_template_btn.clicked.connect(self.upload_foaming_template)
-        self.foaming_template_btn.setGeometry(30, 110, 200, 60)  
+        self.foaming_template_btn.setGeometry(570, 20, 200, 60)  
         set_button_style(self.foaming_template_btn)
 
         self.carpenter_template_btn = QPushButton('Upload Carpenter', self)
         self.carpenter_template_btn.clicked.connect(self.upload_carpenter_template)
-        self.carpenter_template_btn.setGeometry(300, 110, 200, 60)
+        self.carpenter_template_btn.setGeometry(30, 110, 200, 60)
         set_button_style(self.carpenter_template_btn)
 
         self.sales_template_btn = QPushButton('Upload Sales', self)
         self.sales_template_btn.clicked.connect(self.upload_sales_template)
-        self.sales_template_btn.setGeometry(30, 200, 200, 60)
+        self.sales_template_btn.setGeometry(300, 110, 200, 60)
         set_button_style(self.sales_template_btn)
+
+        self.database_btn = QPushButton('Upload Database', self)
+        self.database_btn.clicked.connect(self.upload_database)
+        self.database_btn.setGeometry(570, 110, 200, 60)
+        set_button_style(self.database_btn)
         
         self.generate_btn = QPushButton('Generate Work Order',self)
         self.generate_btn.clicked.connect(self.generate_work_order)
-        self.generate_btn.setGeometry(150, 280, 230, 60)
+        self.generate_btn.setGeometry(450, 200, 230, 60)
         set_button_style(self.generate_btn)
         self.generate_btn.setEnabled(False)
         
         self.status_label = QLabel('',self)
-        self.status_label.setGeometry(20, 360, 550, 50)
+        self.status_label.setGeometry(20, 280, 400, 50)
         self.status_label.setStyleSheet("Qlabel { font-size: 15px; }")
 
         self.order_no_input = QLineEdit(self)
         self.order_no_input.setPlaceholderText("Enter Starting Order Number")
-        self.order_no_input.setGeometry(300, 200, 200, 30)
+        self.order_no_input.setGeometry(120, 200, 200, 30)
 
         self.save_btn = QPushButton('Save',self)
         self.save_btn.clicked.connect(self.set_order_no)
-        self.save_btn.setGeometry(300, 231, 60, 30)
+        self.save_btn.setGeometry(120, 231, 60, 30)
         self.save_btn.setStyleSheet('QPushButton { padding: 5px; font-size: 14px; background-color:white; }')
 
         self.setWindowTitle('Work Order Generator')
@@ -97,16 +102,22 @@ class WorkOrderAppUI(QWidget):
             self.status_label.setText('Foaming Template Uploaded')
 
     def upload_carpenter_template(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Carpenter Template", "", "Word Files (*.docx)")
+        path, _ = QFileDialog.getOpenFileName(self, "Upload Carpenter Template", "", "Word Files (*.docx)")
         if path:
             self.backend.set_carpenter_template_path(path)
             self.status_label.setText(f"Carpenter Template Uploaded")
 
     def upload_sales_template(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Sales Template", "", "Word Files (*.docx)")
+        path, _ = QFileDialog.getOpenFileName(self, "Upload Sales Template", "", "Word Files (*.docx)")
         if path:
             self.backend.set_sales_template_path(path)
             self.status_label.setText(f"Sales Template Uploaded")
+
+    def upload_database(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Upload Database", "", "Excel Files (*.xlsx)")
+        if path:
+            self.backend.set_database_path(path)
+            self.status_label.setText(f"Database Uploaded")
 
     def set_order_no(self):
         try:
@@ -134,6 +145,9 @@ class WorkOrderAppUI(QWidget):
             return
         elif not self.backend.sales_template_path:
             self.status_label.setText('Please upload the Sales Template file')
+            return
+        elif not self.backend.database_path:
+            self.status_label.setText('Please upload the Database file')
             return
         
         if not self.generate_btn.isEnabled():
