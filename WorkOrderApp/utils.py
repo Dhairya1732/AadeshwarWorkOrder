@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5.QtWidgets import QDesktopWidget, QFileDialog
+from PyQt5.QtCore import QDir
 from docx.shared import Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -27,3 +28,15 @@ def set_cell_border(cell, border_color="000000", border_size="4"):
         border.set(qn('w:space'), '0')
         border.set(qn('w:color'), border_color)
         tcPr.append(border)
+
+def upload_file(parent, label, file_type):
+    options = QFileDialog.Options()
+    if label == 'Download Path':
+        options |= QFileDialog.DontUseNativeDialog
+        path = QFileDialog.getExistingDirectory(parent, f"Select {label}", QDir.homePath(), options=options)
+    else:
+        options |= QFileDialog.ReadOnly
+        path, _ = QFileDialog.getOpenFileName(parent, f'Upload {label}', '', file_type, options=options)
+    if path:
+        parent.backend.set_file_path(label, path)
+        parent.status_label.setText(f'{label} Uploaded')

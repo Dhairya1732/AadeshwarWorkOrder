@@ -6,7 +6,9 @@ from utils import set_run_font
 import requests
 from io import BytesIO
 from work_order_backend import WorkOrderAppBackend
+
 backend = WorkOrderAppBackend()
+
 class FoamingWorkOrder:
     def create_work_order(self, order_data, template_path, pdf_filename):
         pdf_output_path = os.path.join(backend.download_path, pdf_filename)     
@@ -26,24 +28,30 @@ class FoamingWorkOrder:
         except Exception as e:
             print(f"Error opening template: {e}")
             return
-        
+        table = doc.tables[0]
         for key, value in data.items():
             if isinstance(value, str):
                 value = value.strip()
-            for table in doc.tables:
-                for row in table.rows:
-                    for cell in row.cells:
-                        for paragraph in cell.paragraphs:
-                            if f'[{key}]' in paragraph.text:
-                                if key == 'Image url':
-                                    paragraph.text = paragraph.text.replace(f'[{key}]', '')
-                                    self.insert_image_from_url(cell, value, width=image_width, height=image_height)
-                                else:
-                                    paragraph.text = paragraph.text.replace(f'[{key}]', str(value))
-                                    for run in paragraph.runs:
-                                        set_run_font(run)
-                                    if template_path==backend.carpenter_template_path and key=='Order Confirmed Date':
-                                        run.font.size = Pt(16)
+            found = False
+            for row in table.rows:
+                if found:
+                    break
+                for cell in row.cells:
+                    if found:
+                        break
+                    for paragraph in cell.paragraphs:
+                        if f'[{key}]' in paragraph.text:    
+                            if key == 'Image url':
+                                paragraph.text = paragraph.text.replace(f'[{key}]', '')
+                                self.insert_image_from_url(cell, value, width=image_width, height=image_height)
+                            else:
+                                paragraph.text = paragraph.text.replace(f'[{key}]', str(value))
+                                for run in paragraph.runs:
+                                    set_run_font(run)
+                                if template_path==backend.carpenter_template_path and key=='Order Confirmed Date':
+                                    run.font.size = Pt(16)
+                            found = True
+                            break        
 
         try:
             doc.save(output_path)

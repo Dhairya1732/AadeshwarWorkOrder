@@ -1,9 +1,9 @@
-import os
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QFileDialog, QLineEdit
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSettings, QDir
+from PyQt5.QtCore import QSettings
 from work_order_backend import WorkOrderAppBackend
-from utils import center_widget, set_button_style
+from functools import partial
+from utils import center_widget, set_button_style, upload_file
 
 COMPANY_NAME = "Aadeshwar"
 APP_NAME = "WorkOrderGenerator"
@@ -20,40 +20,40 @@ class WorkOrderAppUI(QWidget):
         self.initUI()
 
     def initUI(self):
-       
+
         self.set_path_btn = QPushButton('Set Download Path',self)
-        self.set_path_btn.clicked.connect(self.set_download_path)
+        self.set_path_btn.clicked.connect(partial(upload_file, self, 'Download Path', 'None'))
         self.set_path_btn.setGeometry(30, 20, 200, 60)
         set_button_style(self.set_path_btn)
 
         self.csv_btn = QPushButton('Upload CSV File',self)
-        self.csv_btn.clicked.connect(self.upload_csv)
+        self.csv_btn.clicked.connect(partial(upload_file, self, 'CSV file', 'CSV Files (*.csv)'))
         self.csv_btn.setGeometry(300, 20, 200, 60)
         set_button_style(self.csv_btn)
         
         self.foaming_template_btn = QPushButton('Upload Foaming',self)
-        self.foaming_template_btn.clicked.connect(self.upload_foaming_template)
+        self.foaming_template_btn.clicked.connect(partial(upload_file, self, 'Foaming Template', 'Word Files (*.docx)'))
         self.foaming_template_btn.setGeometry(570, 20, 200, 60)  
         set_button_style(self.foaming_template_btn)
 
         self.carpenter_template_btn = QPushButton('Upload Carpenter', self)
-        self.carpenter_template_btn.clicked.connect(self.upload_carpenter_template)
+        self.carpenter_template_btn.clicked.connect(partial(upload_file, self, 'Carpenter Template', 'Word Files (*.docx)'))
         self.carpenter_template_btn.setGeometry(30, 110, 200, 60)
         set_button_style(self.carpenter_template_btn)
 
         self.sales_template_btn = QPushButton('Upload Sales', self)
-        self.sales_template_btn.clicked.connect(self.upload_sales_template)
+        self.sales_template_btn.clicked.connect(partial(upload_file, self, 'Sales Template', 'Word Files (*.docx)'))
         self.sales_template_btn.setGeometry(300, 110, 200, 60)
         set_button_style(self.sales_template_btn)
 
         self.database_btn = QPushButton('Upload Database', self)
-        self.database_btn.clicked.connect(self.upload_database)
+        self.database_btn.clicked.connect(partial(upload_file, self, 'Database file', 'Excel Files (*.xlsx)'))
         self.database_btn.setGeometry(570, 110, 200, 60)
         set_button_style(self.database_btn)
         
         self.generate_btn = QPushButton('Generate Work Order',self)
         self.generate_btn.clicked.connect(self.generate_work_order)
-        self.generate_btn.setGeometry(450, 200, 230, 60)
+        self.generate_btn.setGeometry(555, 200, 230, 60)
         set_button_style(self.generate_btn)
         self.generate_btn.setEnabled(False)
         
@@ -63,74 +63,38 @@ class WorkOrderAppUI(QWidget):
 
         self.order_no_input = QLineEdit(self)
         self.order_no_input.setPlaceholderText("Enter Starting Order Number")
-        self.order_no_input.setGeometry(120, 200, 200, 30)
+        self.order_no_input.setGeometry(30, 200, 200, 30)
+        self.order_no_input.setStyleSheet("background-color: white;")
+
+        self.sales_no_input = QLineEdit(self)
+        self.sales_no_input.setPlaceholderText("Enter Starting Sales Summary Number")
+        self.sales_no_input.setGeometry(30, 232, 230, 30)
+        self.sales_no_input.setStyleSheet("background-color: white;")
 
         self.save_btn = QPushButton('Save',self)
-        self.save_btn.clicked.connect(self.set_order_no)
-        self.save_btn.setGeometry(120, 231, 60, 30)
-        self.save_btn.setStyleSheet('QPushButton { padding: 5px; font-size: 14px; background-color:white; }')
+        self.save_btn.clicked.connect(self.set_numbers)
+        self.save_btn.setGeometry(300, 200, 80, 40)
+        set_button_style(self.save_btn)
 
         self.setWindowTitle('Work Order Generator')
         self.setWindowIcon(QIcon('app_icon.ico'))  
-        self.csv_path = ''
-        self.template_path = ''
 
         center_widget(self)  
 
-    def set_download_path(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        download_path = QFileDialog.getExistingDirectory(self, "Select Download Path", QDir.homePath(), options=options)
-        if download_path:
-            self.backend.set_download_path(download_path)
-
-
-    def upload_csv(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload CSV File', '', 'CSV Files (*.csv)', options=options)
-        if file_path:
-            self.backend.set_csv_path(file_path)
-            self.status_label.setText('CSV File Uploaded')
-    
-    def upload_foaming_template(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, 'Upload Foaming Template', '', 'Word Files (*.docx)', options=options)
-        if file_path:
-            self.backend.set_foaming_template_path(file_path)
-            self.status_label.setText('Foaming Template Uploaded')
-
-    def upload_carpenter_template(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Upload Carpenter Template", "", "Word Files (*.docx)")
-        if path:
-            self.backend.set_carpenter_template_path(path)
-            self.status_label.setText(f"Carpenter Template Uploaded")
-
-    def upload_sales_template(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Upload Sales Template", "", "Word Files (*.docx)")
-        if path:
-            self.backend.set_sales_template_path(path)
-            self.status_label.setText(f"Sales Template Uploaded")
-
-    def upload_database(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Upload Database", "", "Excel Files (*.xlsx)")
-        if path:
-            self.backend.set_database_path(path)
-            self.status_label.setText(f"Database Uploaded")
-
-    def set_order_no(self):
+    def set_numbers(self):
         try:
-            if not self.order_no_input.text():
-                raise ValueError("Order number cannot be empty.")
-            starting_order_no = int(self.order_no_input.text())  
-            if starting_order_no <= 0:
-                raise ValueError("Starting order number must be a positive integer")
+            if not self.order_no_input.text() or not self.sales_no_input.text():
+                raise ValueError("Input field cannot be empty.")
+            starting_order_no = int(self.order_no_input.text()) 
+            starting_sales_no = int(self.sales_no_input.text()) 
+            if starting_order_no <= 0 or starting_sales_no<=0:
+                raise ValueError("Input values must be a positive integer")
             self.backend.current_order_no = starting_order_no  
-            self.status_label.setText("Order number saved.")
+            self.backend.current_sales_no = starting_sales_no
+            self.status_label.setText("Order number and sales number saved.")
             self.generate_btn.setEnabled(True)
         except ValueError:
-            self.status_label.setText("Invalid starting order number. Please enter a positive integer.")
+            self.status_label.setText("Invalid input value. Please enter a positive integer.")
             self.generate_btn.setEnabled(False)
     
     def generate_work_order(self):
@@ -151,7 +115,7 @@ class WorkOrderAppUI(QWidget):
             return
         
         if not self.generate_btn.isEnabled():
-            self.status_label.setText("Invalid order number. Please enter a valid order number.")
+            self.status_label.setText("Invalid input value. Please enter a positive integer.")
             return
         
         self.backend.generate_work_order()

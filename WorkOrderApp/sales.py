@@ -3,17 +3,20 @@ import os
 from docx2pdf import convert 
 from utils import set_cell_border
 from work_order_backend import WorkOrderAppBackend
-backend = WorkOrderAppBackend()
+
 class SalesSummary:
+    def __init__(self, backend):
+        self.backend = backend
+
     def create_sales_summary(self, orders_data, template_path, pdf_filename):
-        pdf_output_path = os.path.join(backend.download_path, pdf_filename)
+        pdf_output_path = os.path.join(self.backend.download_path, pdf_filename)
         try:
             docx_filename = pdf_filename.replace('.pdf', '.docx')
-            docx_output_path = os.path.join(backend.download_path, docx_filename)
+            docx_output_path = os.path.join(self.backend.download_path, docx_filename)
             self.process_sales_summary(orders_data, template_path, docx_output_path)
             convert(docx_output_path, pdf_output_path)
-            print(f"Successfully processed sales summary for {orders_data[0]['To be shipped Before']}.")
             os.remove(docx_output_path)
+            print(f"Successfully processed sales summary for {orders_data[0]['To be shipped Before']}.")
         except Exception as e:
             print(f"Failed to process sales summary: {e}")
 
@@ -26,6 +29,14 @@ class SalesSummary:
 
         table = doc.tables[0]
         sr_no = 1
+        sales_no = self.backend.current_sales_no
+
+        if len(table.rows) >= 1 and len(table.rows[0].cells) > 0:
+            table.rows[0].cells[0].text = table.rows[0].cells[0].text.replace('[SalesNo]', str(sales_no))
+
+        if len(table.rows) >= 2 and len(table.rows[1].cells) > 0:
+            table.rows[1].cells[0].text = table.rows[1].cells[0].text.replace('[Delivery Date]',orders_data[0]['To be shipped Before'])
+
         for order_data in orders_data:
             row = table.add_row()
             cells = row.cells
@@ -46,6 +57,8 @@ class SalesSummary:
 
             sr_no += 1
             
+        self.backend.current_sales_no += 1
+        
         try:
             doc.save(output_path)
             print(f"Sales summary document saved to {output_path}")
