@@ -2,9 +2,7 @@ import pandas as pd
 from PyQt5.QtCore import QSettings, QDir
 from datetime import timedelta, datetime
 from collections import defaultdict
-
-COMPANY_NAME = "Aadeshwar"
-APP_NAME = "WorkOrderGenerator"
+from config import COMPANY_NAME, APP_NAME
 
 class WorkOrderAppBackend:
     def __init__(self):
@@ -31,15 +29,26 @@ class WorkOrderAppBackend:
         fabric_sheet = pd.read_excel(self.database_path ,sheet_name="Fabric")
         orders = orders.head(3)
         orders = orders.fillna("") 
-        columns_to_ignore = ['Unit Price', 'TOTAL', 'Shipping Address', 'status', 'Promised Delivery Date']
+        columns_to_ignore = ['Unit Price', 'TOTAL', 'Shipping Address', 'status', 'Promised Delivery Date' , 'Product_Name' , 'Merchant_SKU_ID']
         sales_summary_data = defaultdict(list)
-
-        relevant_columns = ['SKU_ID', 'Legs', 'Legs Quantity', 'Cushion Qty', 'Cushion Fabric', 'Sofa Fabric', 'Legs Finish', 'Legs Assembly', 'Cushions', 'Cushion Size', 'Dimensions' , 'Carpenter Inches' , 'Foaming Inches']
-        fabric_sheet = fabric_sheet[relevant_columns]
-        fabric_sheet = fabric_sheet.fillna("") 
-        
+        carpenter_work_orders = defaultdict(list)
+        fabric_sheet = fabric_sheet.fillna("")
+         
         for index, row in orders.iterrows():
             order_data = row.to_dict()
+
+            sku_id = order_data['SKU ID']
+            matching_fabric = fabric_sheet[fabric_sheet['SKU_ID'] == sku_id]
+            if not matching_fabric.empty:
+                additional_data = matching_fabric.iloc[0].to_dict()
+                for key, value in additional_data.items():
+                    if key not in order_data or order_data[key] == "":
+                        order_data[key] = value if value != "" else ""
+            else:
+                for column in fabric_sheet.columns:
+                    if column not in order_data:
+                        order_data[column] = ""
+
             for column in columns_to_ignore:
                 order_data.pop(column, None)
 
@@ -56,13 +65,6 @@ class WorkOrderAppBackend:
             order_no = f"G1/{current_month}/{self.current_order_no}"
             order_data['OrderNo'] = order_no
 
-            sku_id = order_data['SKU ID']
-            if fabric_sheet['SKU_ID'].isin([sku_id]).any():
-                additional_data = fabric_sheet[fabric_sheet['SKU_ID'] == sku_id].to_dict('records')[0]
-            else:
-                additional_data= {col: "" for col in relevant_columns if col!="SKU_ID"}
-            order_data.update(additional_data)
-
             foaming_inches = order_data.get('Foaming Inches', '').strip()
             qty = order_data.get('QTY', '')
             try:
@@ -73,9 +75,14 @@ class WorkOrderAppBackend:
             from foaming import FoamingWorkOrder
             self.foaming = FoamingWorkOrder()
             self.foaming.create_work_order(order_data, self.foaming_template_path, f"Foaming_{index+1}.pdf")
-            #self.create_work_order(order_data, self.carpenter_template_path, f"carpenter_{index+1}.pdf")
             sales_summary_data[order_data['To be shipped Before']].append(order_data)
+            carpenter_work_orders[order_data['To be shipped Before']].append(order_data)
             self.current_order_no += 1
+
+        from carpenter import CarpenterWorkOrder
+        for shipping_date,orders_data in carpenter_work_orders.items():
+            self.carpenter = CarpenterWorkOrder(self)
+            self.carpenter.create_carpenter_order(orders_data, self.carpenter_template_path, f"carpenter_{shipping_date}.pdf")
 
         from sales import SalesSummary
         for shipping_date, orders_data in sales_summary_data.items():

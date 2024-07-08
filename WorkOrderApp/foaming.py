@@ -7,18 +7,19 @@ import requests
 from io import BytesIO
 from work_order_backend import WorkOrderAppBackend
 
-backend = WorkOrderAppBackend()
-
 class FoamingWorkOrder:
+    def __init__(self):
+        self.backend = WorkOrderAppBackend()
+
     def create_work_order(self, order_data, template_path, pdf_filename):
-        pdf_output_path = os.path.join(backend.download_path, pdf_filename)     
+        pdf_output_path = os.path.join(self.backend.download_path, pdf_filename)     
         try:
             docx_filename = pdf_filename.replace('.pdf', '.docx')
-            docx_output_path = os.path.join(backend.download_path, docx_filename)
+            docx_output_path = os.path.join(self.backend.download_path, docx_filename)
             self.process_work_order(order_data, template_path, docx_output_path, image_width=Pt(100), image_height=Pt(100))
             convert(docx_output_path, pdf_output_path)
-            print(f"Successfully processed work order {order_data['OrderNo']}.")
             os.remove(docx_output_path)
+            print(f"Successfully processed work order {order_data['OrderNo']}.")
         except Exception as e:
             print(f"Failed to process work order {order_data['OrderNo']}: {e}")
 
@@ -47,9 +48,7 @@ class FoamingWorkOrder:
                             else:
                                 paragraph.text = paragraph.text.replace(f'[{key}]', str(value))
                                 for run in paragraph.runs:
-                                    set_run_font(run)
-                                if template_path==backend.carpenter_template_path and key=='Order Confirmed Date':
-                                    run.font.size = Pt(16)
+                                    set_run_font(run, 9)
                             found = True
                             break        
 

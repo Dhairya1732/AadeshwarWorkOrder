@@ -4,9 +4,7 @@ from PyQt5.QtCore import QSettings
 from work_order_backend import WorkOrderAppBackend
 from functools import partial
 from utils import center_widget, set_button_style, upload_file
-
-COMPANY_NAME = "Aadeshwar"
-APP_NAME = "WorkOrderGenerator"
+from config import COMPANY_NAME, APP_NAME
 
 class WorkOrderAppUI(QWidget):
     def __init__(self):

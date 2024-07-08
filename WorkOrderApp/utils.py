@@ -13,7 +13,7 @@ def center_widget(widget):
 def set_button_style(button):
     button.setStyleSheet('QPushButton { padding: 10px; font-size: 20px; background-color: white; }')
 
-def set_run_font(run, font_name='Times New Roman', font_size=9):
+def set_run_font(run, font_size, font_name='Times New Roman'):
     run.font.name = font_name
     run.font.size = Pt(font_size)
 

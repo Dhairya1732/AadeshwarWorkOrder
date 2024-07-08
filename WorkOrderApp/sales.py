@@ -1,8 +1,8 @@
 from docx import Document
 import os
 from docx2pdf import convert 
-from utils import set_cell_border
-from work_order_backend import WorkOrderAppBackend
+from utils import set_cell_border, set_run_font
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 class SalesSummary:
     def __init__(self, backend):
@@ -32,10 +32,19 @@ class SalesSummary:
         sales_no = self.backend.current_sales_no
 
         if len(table.rows) >= 1 and len(table.rows[0].cells) > 0:
-            table.rows[0].cells[0].text = table.rows[0].cells[0].text.replace('[SalesNo]', str(sales_no))
+            cell = table.rows[0].cells[0]
+            cell.text = cell.text.replace('[SalesNo]', str(sales_no))
+            for paragraph in cell.paragraphs:
+                    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    for run in paragraph.runs:
+                        set_run_font(run, 16)
 
         if len(table.rows) >= 2 and len(table.rows[1].cells) > 0:
-            table.rows[1].cells[0].text = table.rows[1].cells[0].text.replace('[Delivery Date]',orders_data[0]['To be shipped Before'])
+            cell = table.rows[1].cells[0]
+            cell.text = cell.text.replace('[Delivery Date]', orders_data[0]['To be shipped Before'])
+            for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        set_run_font(run, 11)
 
         for order_data in orders_data:
             row = table.add_row()
@@ -50,6 +59,9 @@ class SalesSummary:
 
             for cell in cells:
                 set_cell_border(cell)
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        set_run_font(run, 11)
 
             for i in range(len(cells), 10):  
                 cell = row.add_cell()
