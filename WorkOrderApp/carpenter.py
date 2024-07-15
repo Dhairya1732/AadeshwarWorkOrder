@@ -21,7 +21,7 @@ class CarpenterWorkOrder:
         except Exception as e:
             print(f"Failed to process carpenter order: {e}")
 
-    def process_order_data(self, order_data, template_path, output_path):
+    def process_order_data(self, orders, template_path, output_path):
         try:
             doc = Document(template_path)
         except Exception as e:
@@ -32,7 +32,7 @@ class CarpenterWorkOrder:
 
         if len(table.rows) >= 2 and len(table.rows[1].cells) > 0:
             cell = table.rows[1].cells[0]
-            cell.text = cell.text.replace('[CarpenterName]',order_data[0]['Carpenter Team'])
+            cell.text = cell.text.replace('[CarpenterName]',orders[0]['Carpenter Team'])
             for paragraph in cell.paragraphs:
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 for run in paragraph.runs:
@@ -42,19 +42,19 @@ class CarpenterWorkOrder:
 
         if len(table.rows) >= 3 and len(table.rows[2].cells) > 0:
             cell = table.rows[2].cells[0]
-            cell.text = cell.text.replace('[Delivery Date]', order_data[0]['To be shipped Before'])
+            cell.text = cell.text.replace('[Delivery Date]', orders[0]['To be shipped Before'])
             for paragraph in cell.paragraphs:
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 for run in paragraph.runs:
                     set_run_font(run, 16)
                     
-        for order_data in order_data:
+        for order_data in orders:
             row = table.add_row()
             cells = row.cells
             cells[0].text = str(order_data['QTY'])
             cells[1].text = order_data['OrderNo']
             cells[2].text = order_data['To be shipped Before']
-            cells[3].text = order_data['Your SKU ID']
+            cells[3].text = order_data['Carpenter Product']
             cells[4].text = str(order_data['Carpenter Inches'])
             cells[5].text = str(order_data['TotalInches'])
 
@@ -63,6 +63,13 @@ class CarpenterWorkOrder:
                 for paragraph in cell.paragraphs:
                     for run in paragraph.runs:
                         set_run_font(run, 11)
+
+        total_inches_row = table.add_row()
+        total_inches_row.cells[-2].text="Total Inches"
+        set_cell_border(total_inches_row.cells[-2])
+        total_inches = sum(int(order_data_item['TotalInches']) for order_data_item in orders)
+        total_inches_row.cells[-1].text = str(total_inches)
+        set_cell_border(total_inches_row.cells[-1])
         
         try:
             doc.save(output_path)

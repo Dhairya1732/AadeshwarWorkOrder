@@ -68,9 +68,9 @@ class WorkOrderAppBackend:
             foaming_inches = order_data.get('Foaming Inches', '').strip()
             qty = order_data.get('QTY', '')
             try:
-                order_data['TotalInches'] = str(int(foaming_inches) * int(qty)) if foaming_inches and qty else ''
+                order_data['TotalInches'] = str(int(foaming_inches) * int(qty)) if foaming_inches and qty else '0'
             except ValueError:
-                order_data['TotalInches'] = ''
+                order_data['TotalInches'] = '0'
 
             from foaming import FoamingWorkOrder
             self.foaming = FoamingWorkOrder()
