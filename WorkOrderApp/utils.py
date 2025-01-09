@@ -1,17 +1,37 @@
-from PyQt5.QtWidgets import QDesktopWidget, QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QPushButton, QLineEdit
 from PyQt5.QtCore import QDir
 from docx.shared import Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
-def center_widget(widget):
-    qr = widget.frameGeometry()
-    cp = QDesktopWidget().availableGeometry().center()
-    qr.moveCenter(cp)
-    widget.move(qr.topLeft())
+def create_button(text):
+    button = QPushButton(text)
+    button.setStyleSheet("""QPushButton {
+                                background-color: #4CAF50;
+                                color: white;
+                                font-size: 18px;
+                                border-radius: 8px;
+                                padding: 10px 20px;
+                                        }
+                            QPushButton:hover {
+                                background-color: #45a049;
+                                                }""")
+    return button
 
-def set_button_style(button):
-    button.setStyleSheet('QPushButton { padding: 10px; font-size: 20px; background-color: white; }')
+def create_line_edit(text):
+    line_edit = QLineEdit()
+    line_edit.setPlaceholderText(text)
+    line_edit.setMaximumWidth(350)
+    line_edit.setStyleSheet("""QLineEdit {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+    }
+    QLineEdit:focus {
+        background-color: #e8f5e9;
+    }""")
+    return line_edit
 
 def set_run_font(run, font_size, font_name='Times New Roman'):
     run.font.name = font_name
