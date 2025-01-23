@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFileDialog, QPushButton, QLineEdit
+from PyQt5.QtWidgets import QFileDialog, QPushButton, QLineEdit, QSizePolicy
 from PyQt5.QtCore import QDir
 from docx.shared import Pt
 from docx.oxml import OxmlElement
@@ -6,16 +6,18 @@ from docx.oxml.ns import qn
 
 def create_button(text):
     button = QPushButton(text)
+    button.setMinimumWidth(350)
     button.setStyleSheet("""QPushButton {
                                 background-color: #4CAF50;
                                 color: white;
-                                font-size: 18px;
+                                font-size: 22px;
                                 border-radius: 8px;
                                 padding: 10px 20px;
                                         }
                             QPushButton:hover {
                                 background-color: #45a049;
                                                 }""")
+    button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
     return button
 
 def create_line_edit(text):
@@ -24,9 +26,10 @@ def create_line_edit(text):
     line_edit.setMaximumWidth(350)
     line_edit.setStyleSheet("""QLineEdit {
         background-color: #f0f0f0;
+        color: black;
         border-radius: 5px;
         padding: 10px;
-        font-size: 16px;
+        font-size: 18px;
     }
     QLineEdit:focus {
         background-color: #e8f5e9;
@@ -52,7 +55,7 @@ def set_cell_border(cell, border_color="000000", border_size="4"):
 def upload_file(parent, label, file_type):
     options = QFileDialog.Options()
     if label == 'Download Path':
-        options |= QFileDialog.DontUseNativeDialog
+        options |= QFileDialog.ShowDirsOnly
         path = QFileDialog.getExistingDirectory(parent, f"Select {label}", QDir.homePath(), options=options)
     else:
         options |= QFileDialog.ReadOnly

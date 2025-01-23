@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QLabel, QApplication, QWidget, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QSettings, Qt
 from work_order_backend import WorkOrderAppBackend
-from functools import partial
 from utils import create_button, upload_file, create_line_edit
 from config import COMPANY_NAME, APP_NAME
 import sys
@@ -18,7 +17,7 @@ class WorkOrderAppUI(QMainWindow):
         self.setWindowState(Qt.WindowState.WindowMaximized)
         self.setWindowTitle("Aadeshwar Work Order Generator")
         self.setWindowIcon(QIcon(r"assets\images\card_image.png"))
-        self.setStyleSheet("background-color:#f1f1f1;")
+        self.setStyleSheet("background-color: #2c3e50; color: #ecf0f1;")
 
         # Container Widget
         container = QWidget()
@@ -30,91 +29,93 @@ class WorkOrderAppUI(QMainWindow):
 
         # Title Label
         title_label = QLabel("Aadeshwar Work Order Generator")
-        title_label.setFont(QFont("Arial", 24, QFont.Bold))
+        title_label.setFont(QFont("Arial", 26, QFont.Bold))
         title_label.setAlignment(Qt.AlignCenter)
-        title_label.setStyleSheet("color: #333333; padding: 20px;")
+        title_label.setStyleSheet("color: #ecf0f1; margin-bottom: 20px;")
         main_layout.addWidget(title_label)
 
-        # Button Layout 1 (Upload Template Files)
-        button_layout1 = QHBoxLayout()
-        button_layout1.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.addLayout(button_layout1)
+        # Grid Layout for Buttons
+        button_layout = QVBoxLayout()
+        button_layout.setSpacing(20)
+        main_layout.addLayout(button_layout)
 
-        # Button Layout 2 (Paths and CSV upload)
-        button_layout2 = QHBoxLayout()
-        button_layout2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.addLayout(button_layout2)
+        # Row 1: Upload Templates
+        upload_layout = QHBoxLayout()
+        upload_layout.setSpacing(30)
+        button_layout.addLayout(upload_layout)
+        button_layout.setSpacing(50)
 
-        # Button Layout 3 (Order numbers and generate)
-        button_layout3 = QHBoxLayout()
-        button_layout3.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.addLayout(button_layout3)
+        # Row 2: Set Paths and Upload Files
+        path_layout = QHBoxLayout()
+        path_layout.setSpacing(30)
+        button_layout.addLayout(path_layout)
+        button_layout.setSpacing(50)
+
+        # Row 3: Inputs and Generate Button
+        input_generate_layout = QHBoxLayout()
+        input_generate_layout.setSpacing(20)
+        button_layout.addLayout(input_generate_layout)
 
         # Button to upload foaming template
         foaming_btn = create_button('Upload Foaming Template')
-        foaming_btn.clicked.connect(partial(upload_file, self, 'Foaming Template', 'Word Files (*.docx)'))
-        button_layout1.addWidget(foaming_btn)
-        button_layout1.addSpacing(500)
+        foaming_btn.clicked.connect(lambda: upload_file(self, 'Foaming Template', 'Word Files (*.docx)'))
+        upload_layout.addWidget(foaming_btn)
 
         # Button to upload carpenter template
         carpenter_btn = create_button('Upload Carpenter Template')
-        carpenter_btn.clicked.connect(partial(upload_file, self, 'Carpenter Template', 'Word Files (*.docx)'))
-        button_layout1.addWidget(carpenter_btn)
-        button_layout1.addSpacing(500)
+        carpenter_btn.clicked.connect(lambda: upload_file(self, 'Carpenter Template', 'Word Files (*.docx)'))
+        upload_layout.addWidget(carpenter_btn)
 
         # Button to upload sales template
         sales_btn = create_button('Upload Sales Template')
-        sales_btn.clicked.connect(partial(upload_file, self, 'Sales Template', 'Word Files (*.docx)'))
-        button_layout1.addWidget(sales_btn)
+        sales_btn.clicked.connect(lambda: upload_file(self, 'Sales Template', 'Word Files (*.docx)'))
+        upload_layout.addWidget(sales_btn)
 
         # Button to set download path
         path_btn = create_button('Set Download Path')
-        path_btn.clicked.connect(partial(upload_file, self, 'Download Path', 'None'))
-        button_layout2.addWidget(path_btn)
-        button_layout2.addSpacing(500)
+        path_btn.clicked.connect(lambda: upload_file(self, 'Download Path', 'None'))
+        path_layout.addWidget(path_btn)
 
         # Button to upload pending orders
-        csv_btn = create_button('Upload CSV File')
-        csv_btn.clicked.connect(partial(upload_file, self, 'CSV file', 'CSV Files (*.csv)'))
-        button_layout2.addWidget(csv_btn)
-        button_layout2.addSpacing(500)
+        csv_btn = create_button('Upload Pending Orders')
+        csv_btn.clicked.connect(lambda: upload_file(self, 'Pending Orders', 'CSV Files (*.csv)'))
+        path_layout.addWidget(csv_btn)
 
         # Button to upload database file
         database_btn = create_button('Upload Database')
-        database_btn.clicked.connect(partial(upload_file, self, 'Database file', 'Excel Files (*.xlsx)'))
-        button_layout2.addWidget(database_btn)
-        
-        # Button to generate work orders
-        self.generate_btn = create_button('Generate Work Orders')
-        self.generate_btn.clicked.connect(self.generate_work_order)
-        self.generate_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        self.generate_btn.setEnabled(False)
-        button_layout3.addWidget(self.generate_btn)
-        button_layout3.addSpacing(500)
+        database_btn.clicked.connect(lambda: upload_file(self, 'Database file', 'Excel Files (*.xlsx)'))
+        path_layout.addWidget(database_btn)
 
         # Layout for inputs
-        input_layout = QVBoxLayout()
-        button_layout3.addLayout(input_layout)
-        button_layout3.addSpacing(100)
+        input_fields_layout = QVBoxLayout()
+        input_fields_layout.setSpacing(10)
+        input_generate_layout.addLayout(input_fields_layout)
 
         # Order no. input
         self.order_no_input = create_line_edit("Enter Starting Order Number")
-        input_layout.addWidget(self.order_no_input)
+        input_fields_layout.addWidget(self.order_no_input)
 
         # Sales no. input
         self.sales_no_input = create_line_edit("Enter Starting Sales Summary Number")
-        input_layout.addWidget(self.sales_no_input)
+        input_fields_layout.addWidget(self.sales_no_input)
 
         # Button to order no. and sales no.
         save_btn = create_button('Save')
-        save_btn.clicked.connect(self.set_numbers)  
-        save_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        button_layout3.addWidget(save_btn)
+        save_btn.clicked.connect(lambda: self.set_numbers()) 
+        save_btn.setMinimumWidth(200) 
+        input_generate_layout.addWidget(save_btn)
+
+        # Button to generate work orders
+        self.generate_btn = create_button('Generate Work Orders')
+        self.generate_btn.clicked.connect(lambda: self.generate_work_order())
+        self.generate_btn.setEnabled(False)
+        input_generate_layout.addWidget(self.generate_btn)
 
         # Label display various messages
         self.status_label = QLabel('')
         self.status_label.setFont(QFont("Arial", 16))
-        self.status_label.setStyleSheet("QLabel { font-family: 'Roboto', sans-serif; font-size: 28px; color: #333; }")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setStyleSheet("font-family: 'Roboto', sans-serif; font-size: 28px; color: #ecf0f1; margin-top: 20px;")
         main_layout.addWidget(self.status_label)
 
     def set_numbers(self):

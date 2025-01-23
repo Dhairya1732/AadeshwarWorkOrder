@@ -1,6 +1,5 @@
 from docx import Document
 import os
-from docx.shared import Pt
 from docx.enum.text import WD_UNDERLINE, WD_ALIGN_PARAGRAPH
 from utils import set_cell_border, set_run_font
 from docx2pdf import convert 

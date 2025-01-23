@@ -3,9 +3,13 @@ from PyQt5.QtCore import QSettings, QDir
 from datetime import timedelta, datetime
 from collections import defaultdict
 from config import COMPANY_NAME, APP_NAME
+from foaming import FoamingWorkOrder
+from carpenter import CarpenterWorkOrder
+from sales import SalesSummary
 
 class WorkOrderAppBackend:
     def __init__(self):
+        # Default Values for the variables
         self.csv_path = ''
         self.foaming_template_path = ''
         self.carpenter_template_path = ''
@@ -18,6 +22,7 @@ class WorkOrderAppBackend:
         self.load_settings()
 
     def load_settings(self):
+        # Load all the previously saved files 
         self.download_path = self.settings.value("download_path", QDir.homePath())
         self.foaming_template_path = self.settings.value("foaming_template_path", '')
         self.carpenter_template_path = self.settings.value("carpenter_template_path", '')
@@ -27,7 +32,7 @@ class WorkOrderAppBackend:
     def generate_work_order(self):
         orders = pd.read_csv(self.csv_path)
         fabric_sheet = pd.read_excel(self.database_path ,sheet_name="Fabric")
-        orders = orders.head(3)
+        orders = orders.head(1)
         orders = orders.fillna("") 
         columns_to_ignore = ['Unit Price', 'TOTAL', 'Shipping Address', 'status', 'Promised Delivery Date' , 'Product_Name' , 'Merchant_SKU_ID']
         sales_summary_data = defaultdict(list)
@@ -72,26 +77,23 @@ class WorkOrderAppBackend:
             except ValueError:
                 order_data['TotalInches'] = '0'
 
-            from foaming import FoamingWorkOrder
-            self.foaming = FoamingWorkOrder()
+            self.foaming = FoamingWorkOrder(self)
             self.foaming.create_work_order(order_data, self.foaming_template_path, f"Foaming_{index+1}.pdf")
             sales_summary_data[order_data['To be shipped Before']].append(order_data)
             carpenter_work_orders[order_data['To be shipped Before']].append(order_data)
             self.current_order_no += 1
 
-        from carpenter import CarpenterWorkOrder
         for shipping_date,orders_data in carpenter_work_orders.items():
             self.carpenter = CarpenterWorkOrder(self)
-            self.carpenter.create_carpenter_order(orders_data, self.carpenter_template_path, f"carpenter_{shipping_date}.pdf")
+            self.carpenter.create_carpenter_order(orders_data, self.carpenter_template_path, f"Carpenter_{shipping_date}.pdf")
 
-        from sales import SalesSummary
         for shipping_date, orders_data in sales_summary_data.items():
             self.sales = SalesSummary(self)
-            self.sales.create_sales_summary(orders_data, self.sales_template_path, f"sales_{shipping_date}.pdf")
+            self.sales.create_sales_summary(orders_data, self.sales_template_path, f"Sales_{shipping_date}.pdf")
 
     def set_file_path(self, label, path):
         match label:
-            case 'CSV file':
+            case 'Pending Orders':
                 self.csv_path = path
             case 'Foaming Template':
                 self.foaming_template_path = path

@@ -5,11 +5,10 @@ from docx2pdf import convert
 from utils import set_run_font
 import requests
 from io import BytesIO
-from work_order_backend import WorkOrderAppBackend
 
 class FoamingWorkOrder:
-    def __init__(self):
-        self.backend = WorkOrderAppBackend()
+    def __init__(self, backend):
+        self.backend = backend
 
     def create_work_order(self, order_data, template_path, pdf_filename):
         pdf_output_path = os.path.join(self.backend.download_path, pdf_filename)     

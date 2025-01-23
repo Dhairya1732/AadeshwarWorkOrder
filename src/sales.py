@@ -55,7 +55,6 @@ class SalesSummary:
             cells[3].text = order_data['Your SKU ID']
             cells[4].text = order_data['Sofa Fabric']
             cells[5].text = str(order_data['QTY'])
-            
 
             for cell in cells:
                 set_cell_border(cell)
