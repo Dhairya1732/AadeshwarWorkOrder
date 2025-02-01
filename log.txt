@@ -1,0 +1,106 @@
+PS D:\Python\AadeshwarWorkOrder> & "C:/Program Files/Python313/python.exe" d:/Python/AadeshwarWorkOrder/src/test.py
+Sat Feb  1 19:52:57 2025    PROFILE.txt
+
+         2647911 function calls (2613528 primitive calls) in 58.190 seconds
+
+   Ordered by: internal time
+   List reduced from 3173 to 100 due to restriction <100>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     10/9   19.537    1.954   34.130    3.792 C:\Program Files\Python313\Lib\site-packages\docx2pdf\__init__.py:101(convert)    
+        9   16.604    1.845   16.604    1.845 {built-in method pythoncom.CoCreateInstance}
+   137/44   10.274    0.075   18.182    0.413 {method 'acquire' of '_thread.lock' objects}
+       36    5.160    0.143    5.160    0.143 {method 'InvokeTypes' of 'PyIDispatch' objects}
+    51670    1.335    0.000    1.335    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:700(xpath)     
+       14    0.716    0.051    0.716    0.051 {method 'read' of '_ssl._SSLSocket' objects}
+       81    0.636    0.008    0.636    0.008 {method 'GetTypeAttr' of 'PyITypeInfo' objects}
+   114414    0.506    0.000    0.597    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:392(get_child_element)
+      679    0.324    0.000    0.324    0.000 {method 'read' of '_io.BufferedReader' objects}
+        5    0.206    0.041    0.206    0.041 {method 'do_handshake' of '_ssl._SSLSocket' objects}
+    24424    0.149    0.000    0.171    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:409(get_child_element_list)
+       27    0.117    0.004    0.117    0.004 {method 'GetTypeInfo' of 'PyIDispatch' objects}
+        1    0.104    0.104    0.104    0.104 C:\Program Files\Python313\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py:60(__init__)
+      208    0.103    0.000    0.103    0.000 {built-in method _io.open_code}
+       27    0.091    0.003    0.091    0.003 {method 'GetTypeComp' of 'PyITypeInfo' objects}
+      180    0.089    0.000    0.091    0.001 {method 'Bind' of 'PyITypeComp' objects}
+   162590    0.086    0.000    0.133    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\ns.py:100(qn)
+    37953    0.074    0.000    0.140    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\worksheet\_reader.py:189(parse_cell)
+      858    0.056    0.000    0.056    0.000 {built-in method nt.stat}
+      117    0.052    0.000    0.052    0.000 {method 'feed' of 'xml.etree.ElementTree.XMLParser' objects}
+        5    0.048    0.010    0.048    0.010 {built-in method _socket.getaddrinfo}
+   164615    0.047    0.000    0.047    0.000 {method 'split' of 'str' objects}
+        1    0.044    0.044    0.044    0.044 {built-in method _winapi._mimetypes_read_windows_registry}
+    75122    0.042    0.000    0.064    0.000 C:\Program Files\Python313\Lib\xml\etree\ElementTree.py:1309(read_events)
+44257/29793    0.040    0.000    0.489    0.000 {method 'join' of 'str' objects}
+9259/8574    0.038    0.000    0.179    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\serialisable.py:46(from_tree)
+38738/24688    0.037    0.000    1.342    0.000 C:\Program Files\Python313\Lib\site-packages\docx\table.py:410(iter_tc_cells)   
+    37953    0.036    0.000    0.037    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\utils\cell.py:206(coordinate_to_tuple)
+237678/237652    0.035    0.000    0.037    0.000 {built-in method builtins.isinstance}
+     2111    0.034    0.000    0.054    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\worksheet\_read_only.py:105(_get_row)
+        5    0.029    0.006    0.029    0.006 {method 'connect' of '_socket.socket' objects}
+    17061    0.028    0.000    0.036    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\sequence.py:24(__set__)
+      928    0.028    0.000    0.036    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:669(first_child_found_in)
+        8    0.027    0.003    0.027    0.003 {built-in method _imp.create_dynamic}
+      113    0.026    0.000    0.026    0.000 {method 'compress' of 'zlib.Compress' objects}
+       45    0.025    0.001    0.025    0.001 {method 'GetNames' of 'PyITypeInfo' objects}
+        5    0.025    0.005    3.810    0.762 d:\Python\AadeshwarWorkOrder\src\foaming.py:25(process_work_order)
+     2112    0.024    0.000    0.305    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\worksheet\_reader.py:125(parse)
+    37998    0.023    0.000    0.029    0.000 C:\Program Files\Python313\Lib\site-packages\pandas\io\excel\_openpyxl.py:589(_convert_cell)
+      208    0.022    0.000    0.022    0.000 {built-in method marshal.loads}
+    15416    0.022    0.000    0.142    0.000 C:\Program Files\Python313\Lib\site-packages\docx\blkcntnr.py:80(paragraphs)      
+    35945    0.021    0.000    0.026    0.000 C:\Program Files\Python313\Lib\site-packages\pandas\core\dtypes\cast.py:182(maybe_box_native)
+    17765    0.021    0.000    0.948    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\text\paragraph.py:95(text) 
+        1    0.021    0.021    0.237    0.237 C:\Program Files\Python313\Lib\site-packages\openpyxl\reader\strings.py:10(read_string_table)
+     2111    0.021    0.000    0.162    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\worksheet\_reader.py:282(parse_row)
+75004/75003    0.019    0.000    0.150    0.000 C:\Program Files\Python313\Lib\xml\etree\ElementTree.py:1233(iterator)
+       18    0.019    0.001    0.019    0.001 {method 'GetDocumentation' of 'PyITypeInfo' objects}
+       63    0.018    0.000    0.018    0.000 C:\Program Files\Python313\Lib\site-packages\docx\opc\oxml.py:53(serialize_part_xml)
+   113859    0.018    0.000    0.018    0.000 {method 'get' of 'xml.etree.ElementTree.Element' objects}
+    20985    0.018    0.000    0.027    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\base.py:39(__set__)
+    14454    0.017    0.000    0.455    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\text\run.py:115(text)      
+    28672    0.017    0.000    0.326    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:472(grid_span)    
+     2111    0.017    0.000    0.046    0.000 C:\Program Files\Python313\Lib\site-packages\pandas\core\methods\to_dict.py:245(<genexpr>)
+      138    0.016    0.000    0.016    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\parser.py:23(parse_xml)    
+    37953    0.016    0.000    0.020    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\cell\read_only.py:14(__init__)
+     6375    0.015    0.000    0.536    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:460(grid_offset)  
+  747/387    0.015    0.000    0.069    0.000 C:\Program Files\Python313\Lib\site-packages\win32com\client\build.py:528(_ResolveType)
+        1    0.015    0.015    0.409    0.409 C:\Program Files\Python313\Lib\site-packages\pandas\io\excel\_openpyxl.py:607(get_sheet_data)
+     9384    0.015    0.000    0.030    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:199(get_attr_value)
+    17763    0.015    0.000    0.018    0.000 C:\Program Files\Python313\Lib\site-packages\docx\text\paragraph.py:26(__init__)  
+    15416    0.014    0.000    0.157    0.000 C:\Program Files\Python313\Lib\site-packages\docx\table.py:247(paragraphs)        
+      108    0.014    0.000    0.014    0.000 {built-in method nt._getfinalpathname}
+     6375    0.014    0.000    0.230    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:79(tc_at_grid_offset)
+     8506    0.013    0.000    0.090    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\cell\text.py:161(__init__)  
+    28116    0.013    0.000    0.020    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\text\run.py:122(<genexpr>) 
+     8506    0.013    0.000    0.027    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\cell\text.py:173(content)   
+     1418    0.013    0.000    0.019    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\parser.py:44(OxmlElement)  
+       18    0.013    0.001    0.013    0.001 {method 'GetRefTypeInfo' of 'PyITypeInfo' objects}
+    75107    0.012    0.000    0.012    0.000 {method 'popleft' of 'collections.deque' objects}
+     10/9    0.012    0.001   22.478    2.498 C:\Program Files\Python313\Lib\site-packages\docx2pdf\__init__.py:16(windows)     
+    18090    0.012    0.000    1.375    0.000 C:\Program Files\Python313\Lib\site-packages\docx\table.py:433(_iter_row_cells)   
+     8857    0.011    0.000    0.021    0.000 C:\Program Files\Python313\Lib\site-packages\docx\table.py:195(__init__)
+    28672    0.011    0.000    0.154    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:829(grid_span)    
+       46    0.011    0.000    0.011    0.000 {built-in method builtins.compile}
+    77/75    0.011    0.000    0.012    0.000 {built-in method builtins.all}
+      132    0.011    0.000    0.011    0.000 C:\Program Files\Python313\Lib\site-packages\docx\image\jpeg.py:217(_read_byte)   
+     1534    0.011    0.000    0.015    0.000 <frozen importlib._bootstrap_external>:101(_path_join)
+    15232    0.010    0.000    0.207    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:541(vMerge)       
+    32219    0.010    0.000    0.466    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\text\paragraph.py:102(<genexpr>)
+    50207    0.010    0.000    0.018    0.000 {built-in method builtins.getattr}
+      242    0.010    0.000    0.010    0.000 {method 'decompress' of 'zlib.Decompress' objects}
+10739/10735    0.010    0.000    0.027    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\base.py:68(__set__)
+    37953    0.010    0.000    0.010    0.000 {method 'findtext' of 'xml.etree.ElementTree.Element' objects}
+      357    0.010    0.000    0.010    0.000 {method 'seek' of '_io.BufferedRandom' objects}
+     6459    0.010    0.000    0.135    0.000 {built-in method builtins.sum}
+     2259    0.009    0.000    1.384    0.001 C:\Program Files\Python313\Lib\site-packages\docx\table.py:395(cells)
+    15232    0.009    0.000    0.114    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:863(vMerge_val)
+     6375    0.009    0.000    0.959    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:738(_tc_above)
+    36963    0.009    0.000    0.009    0.000 {method 'append' of 'list' objects}
+    38826    0.009    0.000    0.009    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\base.py:24(__set__)        
+     9405    0.008    0.000    0.034    0.000 C:\Program Files\Python313\Lib\site-packages\openpyxl\descriptors\nested.py:26(__set__)      
+    12750    0.008    0.000    0.156    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:71(grid_before)
+       31    0.008    0.000    0.008    0.000 {built-in method _io.open}
+3927/3567    0.008    0.000    0.013    0.000 {built-in method __new__ of type object at 0x00007FFD1F3328A0}
+    12571    0.007    0.000    0.017    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\xmlchemy.py:151(_clark_name)
+    16225    0.007    0.000    0.121    0.000 C:\Program Files\Python313\Lib\site-packages\docx\oxml\table.py:467(<genexpr>)
+     9761    0.007    0.000    0.007    0.000 {method 'match' of 're.Pattern' objects}
