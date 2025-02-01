@@ -30,33 +30,39 @@ class WorkOrderAppBackend:
         self.database_path = self.settings.value("database_path", '')
 
     def generate_work_order(self):
-        orders = pd.read_csv(self.csv_path)
-        fabric_sheet = pd.read_excel(self.database_path ,sheet_name="Fabric")
-        orders = orders.head(1)
-        orders = orders.fillna("") 
+        # Load the CSV and Excel files once at the start
+        orders = pd.read_csv(self.csv_path).fillna("")
+        fabric_sheet = pd.read_excel(self.database_path ,sheet_name="Fabric").fillna("")
+
+        # Create a dictionary for fast lookup of fabric sheet by SKU_ID
+        fabric_dict = fabric_sheet.set_index('SKU_ID').to_dict(orient='index')
+
+        orders = orders.head(5)
+
+        # Columns to ignore
         columns_to_ignore = ['Unit Price', 'TOTAL', 'Shipping Address', 'status', 'Promised Delivery Date' , 'Product_Name' , 'Merchant_SKU_ID']
+        
+        # Data containers
         sales_summary_data = defaultdict(list)
         carpenter_work_orders = defaultdict(list)
-        fabric_sheet = fabric_sheet.fillna("")
          
+        # Loop through orders and process
         for index, row in orders.iterrows():
             order_data = row.to_dict()
 
-            sku_id = order_data['SKU ID']
-            matching_fabric = fabric_sheet[fabric_sheet['SKU_ID'] == sku_id]
-            if not matching_fabric.empty:
-                additional_data = matching_fabric.iloc[0].to_dict()
-                for key, value in additional_data.items():
-                    if key not in order_data or order_data[key] == "":
-                        order_data[key] = value if value != "" else ""
-            else:
-                for column in fabric_sheet.columns:
-                    if column not in order_data:
-                        order_data[column] = ""
+            # Get matching fabric data using fast dictionary lookup
+            sku_id = order_data.get('SKU ID')
+            if sku_id in fabric_dict:
+                fabric_data = fabric_dict[sku_id]
+                for key, value in fabric_data.items():
+                    if order_data.get(key, "") == "":
+                        order_data[key] = value
 
+            # Remove ignored columns
             for column in columns_to_ignore:
                 order_data.pop(column, None)
 
+            # Convert dates
             if 'Order Confirmed Date' in order_data:
                 order_data['Order Confirmed Date'] = pd.to_datetime(order_data['Order Confirmed Date'],dayfirst=True).date()
 
@@ -66,19 +72,24 @@ class WorkOrderAppBackend:
                     adjusted_date = (delivery_date - timedelta(days=2)).date()
                     order_data['To be shipped Before'] = adjusted_date.strftime(f"%d-%m-%Y")
 
+            # Generate order number
             current_month = datetime.now().strftime("%B")
             order_no = f"G1/{current_month}/{self.current_order_no}"
             order_data['OrderNo'] = order_no
 
-            foaming_inches = order_data.get('Foaming Inches', '').strip()
+            # Calculate TotalInches
+            foaming_inches = str(order_data.get('Foaming Inches', '')).strip()
             qty = order_data.get('QTY', '')
             try:
                 order_data['TotalInches'] = str(int(foaming_inches) * int(qty)) if foaming_inches and qty else '0'
             except ValueError:
                 order_data['TotalInches'] = '0'
 
+            # Process foaming
             self.foaming = FoamingWorkOrder(self)
             self.foaming.create_work_order(order_data, self.foaming_template_path, f"Foaming_{index+1}.pdf")
+            
+            # Store orders for sales and carpenter
             sales_summary_data[order_data['To be shipped Before']].append(order_data)
             carpenter_work_orders[order_data['To be shipped Before']].append(order_data)
             self.current_order_no += 1

@@ -136,7 +136,7 @@ class WorkOrderAppUI(QMainWindow):
     
     def generate_work_order(self):
         if not self.backend.csv_path:
-            self.status_label.setText('Please upload the CSV file')
+            self.status_label.setText('Please upload the Pending Orders')
             return
         elif not self.backend.foaming_template_path:
             self.status_label.setText('Please upload the Foaming Template file')
@@ -151,10 +151,8 @@ class WorkOrderAppUI(QMainWindow):
             self.status_label.setText('Please upload the Database file')
             return
         
-        if not self.generate_btn.isEnabled():
-            self.status_label.setText("Invalid input value. Please enter a positive integer.")
-            return
-        
+        self.status_label.setText('Generating Work Orders. Please Wait...')
+        QApplication.processEvents()
         self.backend.generate_work_order()
         self.status_label.setText('Work Order Generated')
 
