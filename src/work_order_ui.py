@@ -158,6 +158,6 @@ class WorkOrderAppUI(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = WorkOrderAppUI()
-    ex.show()
+    ui = WorkOrderAppUI()
+    ui.show()
     sys.exit(app.exec_())
